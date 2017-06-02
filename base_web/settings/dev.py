@@ -8,6 +8,6 @@ DEBUG = True
 
 
 try:
-    from .local import *
+    from .localsetting import *
 except ImportError:
     pass

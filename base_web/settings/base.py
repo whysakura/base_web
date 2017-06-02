@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2017/5/23 14:33
+# @Author  : wrd
+
 """
 Django settings for mysite project.
 
@@ -26,10 +30,10 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 SECRET_KEY = 'a35-biprd9d8qmq-$!qq*20_cay5)4)$!dm(1w=fe!x2bt24d-'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
+DEBUG = False
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'base_auth',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -78,20 +83,13 @@ WSGI_APPLICATION = 'base_web.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
+TIME_ZONE = 'Asia/Shanghai'
+LANGUAGE_CODE = 'zh-hans'
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -109,7 +107,7 @@ STATICFILES_FINDERS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(PROJECT_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -119,10 +117,100 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
-# Wagtail settings
-
-WAGTAIL_SITE_NAME = "base_web"
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
-BASE_URL = 'http://example.com'
+
+#BASE_URL = 'http://example.com'
+
+ALLOWED_HOSTS = ['*']
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s : %(message)s'
+        },
+    },
+    'filters': {
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+        },
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR,'logger', 'console.log'),
+            'maxBytes': 1024 * 1024 *5,  # 5 MB
+            'backupCount': 15,
+            'formatter': 'standard',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+        'request_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR,'logger', 'error.log'),
+            'maxBytes': 1024 * 1024 *5,  # 5 MB
+            'backupCount': 15,
+            'formatter': 'standard',
+        },
+        'scprits_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR,'logger', 'script.log'),
+            'maxBytes': 1024 * 1024 *5,  # 5 MB
+            'backupCount': 15,
+            'formatter': 'standard',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['default', 'console'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'base_auth': {
+            'handlers': ['default', 'console'],
+            'level': 'ERROR',
+            'propagate': True
+        },
+        'django.request': {
+            'handlers': ['request_handler'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'scripts': {  # 脚本专用日志
+            'handlers': ['scprits_handler'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+    }
+}
+
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+    ('weiruduan','wrd@putao.cn'),
+)
+
+MANAGERS = ADMINS
+
+# email config
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.exmail.qq.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'pt_admin@putao.cn'
+EMAIL_HOST_PASSWORD = 'putao2015'
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_USE_TLS = True
+EMAIL_SUBJECT_PREFIX = '[PT-BOSS]'

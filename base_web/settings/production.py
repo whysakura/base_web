@@ -5,6 +5,6 @@ from .base import *
 DEBUG = False
 
 try:
-    from .local import *
+    from .localsetting import *
 except ImportError:
     pass
